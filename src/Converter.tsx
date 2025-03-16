@@ -212,6 +212,9 @@ const JsonCsvConverter = () => {
               Copy JSON
             </button>
           </div>
+          <div className="h-[52px]">
+            {/* Empty space to match height with CSV column header area */}
+          </div>
           <textarea
             className="w-full h-96 p-2 border border-gray-300 rounded font-mono text-sm"
             value={jsonText}
@@ -251,36 +254,38 @@ const JsonCsvConverter = () => {
             </button>
           </div>
 
-          {/* Column Selection */}
-          {headers.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2 items-center border border-gray-200 rounded p-2">
-              <div className="flex items-center mr-2">
-                <button
-                  className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded mr-1"
-                  onClick={() => toggleAllHeaders(true)}
-                >
-                  Select All
-                </button>
-                <button
-                  className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
-                  onClick={() => toggleAllHeaders(false)}
-                >
-                  Deselect All
-                </button>
+          {/* Column Selection - Fixed height container */}
+          <div className="h-[52px] overflow-y-auto">
+            {headers.length > 0 ? (
+              <div className="flex flex-wrap gap-2 items-center border border-gray-200 rounded p-2 ">
+                <div className="flex items-center mr-2">
+                  <button
+                    className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded mr-1"
+                    onClick={() => toggleAllHeaders(true)}
+                  >
+                    Select All
+                  </button>
+                  <button
+                    className="text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"
+                    onClick={() => toggleAllHeaders(false)}
+                  >
+                    Deselect All
+                  </button>
+                </div>
+                {headers.map(header => (
+                  <label key={header} className="flex items-center text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedHeaders[header] || false}
+                      onChange={() => toggleHeader(header)}
+                      className="mr-1"
+                    />
+                    {header}
+                  </label>
+                ))}
               </div>
-              {headers.map(header => (
-                <label key={header} className="flex items-center text-sm">
-                  <input
-                    type="checkbox"
-                    checked={selectedHeaders[header] || false}
-                    onChange={() => toggleHeader(header)}
-                    className="mr-1"
-                  />
-                  {header}
-                </label>
-              ))}
-            </div>
-          )}
+            ) : null}
+          </div>
 
           <textarea
             className="w-full h-96 p-2 border border-gray-300 rounded font-mono text-sm"
