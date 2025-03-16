@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const JsonCsvConverter = () => {
   const [jsonText, setJsonText] = useState('[\n  {\n    "name": "John",\n    "age": 30,\n    "city": "New York"\n  },\n  {\n    "name": "Alice",\n    "age": 25,\n    "city": "Los Angeles"\n  }\n]');
   const [csvText, setCsvText] = useState('');
-  const [headers, setHeaders] = useState([]);
-  const [selectedHeaders, setSelectedHeaders] = useState({});
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [selectedHeaders, setSelectedHeaders] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
 
   // Convert JSON to CSV when jsonText changes or headers selection changes
@@ -71,13 +71,14 @@ const JsonCsvConverter = () => {
       setCsvText([csvHeader, ...csvRows].join('\n'));
       setError('');
     } catch (err) {
-      setError(`Error converting JSON to CSV: ${err.message}`);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Error converting JSON to CSV: ${errorMessage}`);
       setCsvText('');
     }
   }, [jsonText, selectedHeaders]);
 
   // Convert CSV to JSON
-  const handleCsvChange = (csvValue) => {
+  const handleCsvChange = (csvValue: string) => {
     setCsvText(csvValue);
     try {
       if (!csvValue.trim()) {
@@ -95,18 +96,18 @@ const JsonCsvConverter = () => {
       const result = [];
 
       for (let i = 1; i < lines.length; i++) {
-        const obj = {};
+        const obj: Record<string, string | number | boolean> = {};
         const values = parseCSVLine(lines[i]);
 
         headers.forEach((header, index) => {
           if (index < values.length) {
             // Try to parse numbers and booleans
-            let value = values[index];
+            let value: string | number | boolean = values[index];
             if (value === 'true') {
               value = true;
             } else if (value === 'false') {
               value = false;
-            } else if (!isNaN(value) && value.trim() !== '') {
+            } else if (!isNaN(Number(value)) && value.trim() !== '') {
               value = Number(value);
             }
             obj[header] = value;
@@ -120,18 +121,19 @@ const JsonCsvConverter = () => {
 
       // Update headers and selected headers
       setHeaders(headers);
-      const newSelectedHeaders = {};
+      const newSelectedHeaders: Record<string, boolean> = {};
       headers.forEach(h => newSelectedHeaders[h] = true);
       setSelectedHeaders(newSelectedHeaders);
 
       setError('');
     } catch (err) {
-      setError(`Error converting CSV to JSON: ${err.message}`);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Error converting CSV to JSON: ${errorMessage}`);
     }
   };
 
   // Parse CSV line handling quoted values with commas
-  const parseCSVLine = (line) => {
+  const parseCSVLine = (line: string) => {
     const result = [];
     let current = '';
     let inQuotes = false;
@@ -163,7 +165,7 @@ const JsonCsvConverter = () => {
   };
 
   // Copy selected content to clipboard
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
       .then(() => {
       })
@@ -174,7 +176,7 @@ const JsonCsvConverter = () => {
   };
 
   // Toggle header selection
-  const toggleHeader = (header) => {
+  const toggleHeader = (header: string) => {
     setSelectedHeaders(prev => ({
       ...prev,
       [header]: !prev[header]
@@ -182,8 +184,8 @@ const JsonCsvConverter = () => {
   };
 
   // Select or deselect all headers
-  const toggleAllHeaders = (selectAll) => {
-    const newSelectedHeaders = {};
+  const toggleAllHeaders = (selectAll: boolean) => {
+    const newSelectedHeaders: Record<string, boolean> = {};
     headers.forEach(header => {
       newSelectedHeaders[header] = selectAll;
     });
